@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Paroisses - MESHORA</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body style="background-color: #ffffff; margin: 0; font-family: 'Segoe UI', system-ui, sans-serif;">
+
+    <div class="container" style="max-width: 1200px; margin: 0 auto;">
+        
+        <header style="text-align: center; padding: 40px 20px;">
+            <h1 style="color: #1e3a8a; font-size: 2.5rem; margin-bottom: 10px;">⛪ MESHORA</h1>
+            <p style="color: #64748b; font-size: 1.1rem;">Choisissez votre Paroisse pour voir les horaires</p>
+        </header>
+
+        <div style="max-width: 550px; margin: 0 auto 30px; padding: 0 15px;">
+            <input type="text" id="paroisseInput" onkeyup="filtrerListe()" 
+                   placeholder="🔍 Rechercher une paroisse ou une ville..." 
+                   style="width: 100%; padding: 15px 25px; border-radius: 50px; border: 1px solid #e2e8f0; outline: none; background: #f0f2f5; font-size: 1rem;">
+        </div>
+
+        <div class="clean-list-container" id="listeParoisses">
+            {% for p in paroisses %}
+            <a href="/paroisse/{{ p.id }}" class="clean-list-item">
+                
+                <div class="clean-avatar">
+                    {% if p.logo_url %}
+                        <img src="{{ p.logo_url }}" alt="Logo" style="width:100%; height:100%; object-fit:cover;">
+                    {% else %}
+                        <i class="fas fa-church"></i>
+                    {% endif %}
+                </div>
+                
+                <div class="clean-info">
+                    <div class="paroisse-name">{{ p.nom }}</div>
+                    <div class="paroisse-city">{{ p.ville }}</div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+    function filtrerListe() {
+        let input = document.getElementById('paroisseInput').value.toLowerCase();
+        let items = document.getElementsByClassName('clean-list-item'); 
+
+        for (let i = 0; i < items.length; i++) {
+            let nom = items[i].querySelector('.paroisse-name').innerText.toLowerCase();
+            let ville = items[i].querySelector('.paroisse-city').innerText.toLowerCase();
+            
+            if (nom.includes(input) || ville.includes(input)) {
+                items[i].style.display = "flex";
+            } else {
+                items[i].style.display = "none";
+            }
+        }
+    }
+    </script>
+</body>
+</html>
+
