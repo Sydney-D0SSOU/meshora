@@ -9,248 +9,454 @@
     
     <style>
         :root {
-            --primary: #3e5f6e; /* Bleu canard */
-            --accent: #e65100;  /* Orange */
-            --success: #10b981; /* Vert */
-            --bg-light: #f8fafc;
+            /* Palette sombre et professionnelle inspirée des suggestions */
+            --bg-dark: #111827; /* Fond principal très sombre */
+            --bg-card: #1f2937; /* Fond des éléments (cartes, menu latéral) */
+            --primary-red: #ef4444; /* Rouge d'accentuation pour les éléments actifs/importants */
+            --text-main: #f3f4f6; /* Texte principal clair */
+            --text-muted: #9ca3af; /* Texte secondaire estompé */
+            --success: #10b981; /* Vert conservé pour le statut en ligne */
+            
+            /* Largeur du menu latéral */
             --sidebar-width: 280px;
         }
 
         body {
             margin: 0;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background-color: var(--bg-light);
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
             display: flex;
+            justify-content: center;
             min-height: 100vh;
+            overflow-x: hidden; /* Empêche le défilement horizontal lors de l'animation du menu */
         }
 
-        /* --- SIDEBAR --- */
-        .sidebar {
-            width: var(--sidebar-width);
-            background-color: var(--primary);
-            color: white;
-            height: 100vh;
-            position: fixed;
+        /* --- CONTENEUR PRINCIPAL TYPE MOBILE --- */
+        .main-container {
+            max-width: 480px; /* Largeur max type smartphone */
+            width: 100%;
             display: flex;
             flex-direction: column;
-            transition: all 0.3s ease;
-            z-index: 1000;
+            position: relative;
         }
 
-        .sidebar-brand {
+        /* --- EN-TÊTE FIXE (Top Bar) --- */
+        .app-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 20px;
+            background-color: var(--bg-dark);
+            border-bottom: 1px solid #374151;
+            position: sticky;
+            top: 0;
+            z-index: 100; /* Reste au-dessus du contenu */
+        }
+        .app-header h1 { 
+            font-size: 1.2rem; 
+            margin: 0; 
+            font-weight: 800; 
+            text-transform: uppercase; 
+            letter-spacing: 2px; 
+            color: var(--text-main); 
+        }
+        .app-header .header-icon { 
+            font-size: 1.3rem; 
+            color: var(--text-muted); 
+            cursor: pointer; 
+            padding: 5px; 
+            transition: color 0.2s;
+        }
+        .app-header .header-icon:hover { color: var(--text-main); }
+
+        /* --- MENU LATÉRAL (Hamburger - Caché par défaut) --- */
+        .side-menu {
+            position: fixed;
+            top: 0;
+            left: calc(-1 * var(--sidebar-width)); /* Complètement caché à gauche */
+            width: var(--sidebar-width);
+            height: 100vh;
+            background-color: var(--bg-card);
+            z-index: 200; /* Au-dessus de tout */
+            transition: left 0.3s ease-out; /* Animation douce */
+            display: flex;
+            flex-direction: column;
+            box-shadow: 10px 0 15px rgba(0,0,0,0.5);
+        }
+
+        /* État actif du menu */
+        .side-menu.active {
+            left: 0; /* Révélé */
+        }
+
+        /* En-tête du menu (Brand + Profil) */
+        .menu-header {
             padding: 30px 20px;
-            font-size: 26px;
+            text-align: center;
+            border-bottom: 1px solid #374151;
+        }
+        .menu-brand {
+            font-size: 24px;
             font-weight: 900;
-            background: white;
-            color: #1e293b;
-            text-align: center;
+            color: var(--text-main);
             letter-spacing: 2px;
+            margin-bottom: 20px;
         }
-
-        .user-profile {
-            padding: 30px 20px;
-            text-align: center;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-
         .user-profile img {
-            width: 85px;
-            height: 85px;
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
             background: white;
             padding: 3px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            margin-bottom: 15px;
+            margin-bottom: 10px;
+        }
+        .user-profile-info {
+            color: var(--text-main);
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        .user-profile-sub {
+            color: var(--text-muted);
+            font-size: 0.8rem;
         }
 
-        .nav-links {
+        /* Liens de navigation du menu */
+        .menu-links {
             list-style: none;
             padding: 0;
             margin: 20px 0;
             flex-grow: 1;
         }
-
-        .nav-links li a {
+        .menu-links li a {
             padding: 15px 25px;
             display: flex;
             align-items: center;
-            color: #f1f5f9;
+            color: var(--text-main);
             text-decoration: none;
-            transition: 0.3s;
+            transition: 0.2s;
             font-weight: 500;
+            font-size: 0.95rem;
         }
-
-        .nav-links li.active { background-color: var(--accent); }
-        .nav-links li a:hover:not(.active) { background-color: rgba(255,255,255,0.1); }
-        .nav-links i { margin-right: 15px; width: 20px; font-size: 1.2rem; }
-
-        /* --- MOBILE MENU BTN --- */
-        #mobile-menu-btn {
-            display: none;
-            position: fixed;
-            top: 15px;
-            left: 15px;
-            z-index: 2001;
-            background: var(--accent);
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            cursor: pointer;
+        .menu-links li a:hover {
+            background-color: rgba(255, 255, 255, 0.05);
         }
-
-        /* --- MAIN CONTENT --- */
-        .main-content {
-            margin-left: var(--sidebar-width);
-            flex-grow: 1;
-            padding: 40px;
-            transition: all 0.3s ease;
+        .menu-links li.active a {
+            color: var(--primary-red);
+            font-weight: 600;
+            background-color: rgba(239, 68, 68, 0.1);
+            border-left: 4px solid var(--primary-red);
+            padding-left: 21px; /* Ajustement padding pour compenser la bordure */
         }
-
-        .header-section {
-            margin-bottom: 40px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #e2e8f0;
-        }
-
-        .header-section h1 { font-size: 2.5rem; color: #1e293b; margin: 0; }
-        .header-section p { color: #64748b; font-size: 1.2rem; }
-
-        /* --- GRID --- */
-        .home-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
-        }
-
-        .menu-card {
-            background: white;
-            border-radius: 20px;
-            padding: 40px 30px;
+        .menu-links i {
+            margin-right: 15px;
+            width: 20px;
+            font-size: 1.1rem;
             text-align: center;
-            text-decoration: none;
-            color: #1e293b;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-            border: 1px solid #e2e8f0;
-            transition: transform 0.3s ease, border-color 0.3s;
         }
 
-        .menu-card:hover {
-            transform: translateY(-10px);
-            border-color: var(--accent);
-            box-shadow: 0 20px 25px rgba(0,0,0,0.05);
-        }
-
-        .card-icon { font-size: 3.5rem; margin-bottom: 20px; display: block; }
-        .menu-card h3 { font-size: 1.4rem; margin-bottom: 10px; }
-
-        /* --- STATS DYNAMIQUES --- */
-        .stats-banner {
-            margin-top: 50px;
-            background: white;
+        /* Bas du menu */
+        .menu-footer {
             padding: 20px;
-            border-radius: 15px;
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            border-top: 1px solid #374151;
+        }
+
+        /* Overlay (fond sombre quand menu ouvert) */
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0,0,0,0.7);
+            z-index: 150; /* Entre le contenu et le menu latéral */
+            display: none; /* Caché par défaut */
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .menu-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* --- CONTENU PRINCIPAL --- */
+        .main-content {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Titre de section */
+        .section-header h2 {
+            font-size: 1.5rem;
+            color: var(--text-main);
+            margin: 0;
+            font-weight: 800;
+        }
+        .section-header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin: 5px 0 0;
+            line-height: 1.5;
+        }
+
+        /* --- LISTE DES PAROISSES (Affichage direct) --- */
+        .paroisse-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .paroisse-item {
+            background-color: var(--bg-card);
+            padding: 15px 20px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-decoration: none;
+            color: var(--text-main);
+            transition: transform 0.2s, border-color 0.2s;
+            border: 1px solid transparent;
+        }
+        .paroisse-item:hover {
+            transform: translateY(-2px);
+            border-color: #374151;
+        }
+        .paroisse-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .paroisse-icon {
+            font-size: 1.3rem;
+            color: var(--primary-red);
+        }
+        .paroisse-name {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        .paroisse-arrow {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* --- BANNIÈRE DE STATS --- */
+        .stats-banner {
+            background-color: var(--bg-card);
+            padding: 15px;
+            border-radius: 12px;
             display: flex;
             justify-content: space-around;
             align-items: center;
-            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
         }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 1.3rem; font-weight: bold; color: var(--primary-red); }
+        .stat-label { color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+        .stat-divider { height: 30px; border-right: 1px solid #374151; }
+        .stat-status { color: var(--success); font-weight: bold; font-size: 0.9rem; display: flex; align-items: center; gap: 5px; }
 
-        /* --- RESPONSIVE --- */
-        @media (max-width: 992px) {
-            #mobile-menu-btn { display: block; }
-            .sidebar { left: -280px; }
-            .sidebar.active { left: 0; }
-            .main-content { margin-left: 0; padding: 20px; padding-top: 80px; }
+        /* --- BLOC ACCÈS GESTIONNAIRE --- */
+        .admin-access {
+            padding: 20px;
+            background-color: rgba(239, 68, 68, 0.05); /* Fond rouge très subtil */
+            border-radius: 12px;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
         }
+        .admin-icon { font-size: 2rem; color: var(--primary-red); }
+        .admin-text h4 { margin: 0; color: var(--text-main); font-size: 1.1rem; }
+        .admin-text p { margin: 5px 0 15px 0; color: var(--text-muted); font-size: 0.85rem; line-height: 1.4; }
+        .admin-btn {
+            background-color: var(--primary-red);
+            color: white;
+            text-decoration: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            display: inline-block;
+            transition: background 0.2s;
+        }
+        .admin-btn:hover { background-color: #dc2626; }
+
+        .welcome-card {
+  position: relative;
+  background: linear-gradient(135deg, #1a237e 0%, #0d1117 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 25px;
+  margin: 20px 15px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* Petit effet décoratif en arrière-plan */
+.welcome-overlay {
+  position: absolute;
+  top: -50px;
+  right: -50px;
+  width: 150px;
+  height: 150px;
+  background: rgba(255, 69, 58, 0.1); /* Utilise le rouge de vos icônes */
+  border-radius: 50%;
+  filter: blur(40px);
+}
+
+.welcome-content {
+  position: relative;
+  z-index: 1;
+}
+
+.welcome-title {
+  font-size: 1.3rem;
+  font-weight: 500;
+  color: #ffffff;
+  margin: 0 0 10px 0 !important;
+  letter-spacing: 0.5px;
+}
+
+.welcome-title span {
+  font-weight: 800;
+  color: #ff453a; /* Harmonisé avec vos icônes existantes */
+  letter-spacing: 1px;
+}
+
+.welcome-text {
+  font-size: 0.95rem;
+  color: #b0b0b0;
+  line-height: 1.5;
+  margin: 0 !important;
+  font-weight: 300;
+}
+
     </style>
 </head>
 <body>
 
-    <button id="mobile-menu-btn"><i class="fas fa-bars"></i></button>
-
-    <nav class="sidebar" id="sidebar">
-        <div class="sidebar-brand">MESHORA</div>
+    <div class="main-container">
         
-        <div class="user-profile">
-            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1043/1043424.png'">
-            <div style="font-weight: 700; font-size: 1.1rem;">Messes Bénin</div>
-            <small style="opacity: 0.8;">Édition Pastorale 2026</small>
-        </div>
-
-        <ul class="nav-links">
-            <li class="active"><a href="{{ url_for('index') }}"><i class="fas fa-home"></i> Accueil</a></li>
-            <li><a href="{{ url_for('liste') }}"><i class="fas fa-church"></i> Paroisses</a></li>
-            <li><a href="{{ url_for('demande') }}"><i class="fas fa-edit"></i> Demande de Messe</a></li>
-            <li><a href="{{ url_for('login_paroisse') }}"><i class="fas fa-lock"></i> Espace Paroisse</a></li>
-        </ul>
-
-        <div style="padding: 20px; text-align: center; font-size: 0.75rem; opacity: 0.6;">
-            &copy; 2026 MESHORA - Benin
-        </div>
-    </nav>
-
-    <main class="main-content">
-        <header class="header-section">
-            <h1>Tableau de Bord</h1>
-            <p>Bonjour ! Bienvenue sur la plateforme de gestion des intentions de messe.</p>
+        <header class="app-header">
+            <i class="fas fa-bars header-icon" id="menu-toggle-open"></i> 
+            <h1>MESHORA</h1>
         </header>
 
-        <section class="home-grid">
-            <a href="{{ url_for('liste') }}" class="menu-card">
-                <span class="card-icon">⛪</span>
-                <h3>Horaires des Messes</h3>
-                <p>Consultez les célébrations en temps réel dans toutes les paroisses partenaires.</p>
-            </a>
-
-            <a href="{{ url_for('demande') }}" class="menu-card">
-                <span class="card-icon">✍️</span>
-                <h3>Demander une Messe</h3>
-                <p>Soumettez vos intentions (Action de grâce, Repos de l'âme) en quelques clics.</p>
-            </a>
-        </section>
-
-        <div class="stats-banner">
-            <div style="text-align: center;">
-                <div style="font-size: 1.5rem; font-weight: bold; color: var(--accent);">{{ paroisses|length if paroisses else '0' }}</div>
-                <div style="color: #64748b; font-size: 0.9rem;">Paroisses inscrites</div>
+        <div class="menu-overlay" id="menu-overlay"></div>
+        
+        <nav class="side-menu" id="side-menu">
+            <div class="menu-header">
+                <div class="menu-brand">MESHORA</div>
+                <div class="user-profile">
+                    <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo Paroisse" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1043/1043424.png'">
+                    <div class="user-profile-info">Messes Bénin</div>
+                </div>
             </div>
-            <div style="height: 40px; border-right: 1px solid #e2e8f0;"></div>
-            <div style="text-align: center;">
-                <div style="font-size: 0.9rem; color: #64748b;">Statut Serveur</div>
-                <div style="color: var(--success); font-weight: bold;"><i class="fas fa-circle" style="font-size: 0.7rem;"></i> En ligne</div>
-            </div>
-        </div>
 
-        <div style="margin-top: 40px; padding: 30px; background: #e0f2fe; border-radius: 20px; display: flex; align-items: center; gap: 20px;">
-            <div style="font-size: 2.5rem;">🔐</div>
-            <div>
-                <h4 style="margin: 0; color: #0369a1;">Accès Gestionnaire</h4>
-                <p style="margin: 5px 0 15px 0; color: #0c4a6e;">Vous êtes un secrétariat paroissial ? Gérez vos intentions et paiements ici.</p>
-                <a href="{{ url_for('login_paroisse') }}" style="background: #0369a1; color: white; text-decoration: none; padding: 10px 25px; border-radius: 10px; font-weight: bold; font-size: 0.9rem;">Se connecter</a>
+            <ul class="menu-links">
+                <li class="active"><a href="{{ url_for('index') }}"><i class="fas fa-home"></i> Accueil</a></li>
+                <li><a href="{{ url_for('liste') }}"><i class="fas fa-church"></i> Toutes les Paroisses</a></li>
+                <li><a href="{{ url_for('demande') }}"><i class="fas fa-edit"></i> Demande de Messe</a></li>
+                <li><a href="{{ url_for('login_paroisse') }}"><i class="fas fa-lock"></i> Espace Paroisse</a></li>
+            </ul>
+
+        </nav>
+
+        <main class="main-content">
+            
+            <div class="welcome-card">
+                <div class="welcome-overlay"></div>
+                <div class="welcome-content">
+                    <p class="welcome-title">Bienvenue sur <span>MESHORA</span></p>
+                    <p class="welcome-text">Votre application dédiée pour simplifier et accompagner votre vie spirituelle au Bénin.</p>
             </div>
-        </div>
-    </main>
+</div>
+            <div class="paroisse-list">
+                <a href="{{ url_for('liste') }}" class="paroisse-item">
+                    <div class="paroisse-info">
+                        <i class="fas fa-church paroisse-icon"></i>
+                        <span class="paroisse-name">Consulter les Horaires des Messes</span>
+                    </div>
+                    <i class="fas fa-chevron-right paroisse-arrow"></i>
+                </a>
+
+                <a href="{{ url_for('demande') }}" class="paroisse-item">
+                    <div class="paroisse-info">
+                        <i class="fas fa-edit paroisse-icon"></i>
+                        <span class="paroisse-name">Faire une Demande de Messe</span>
+                    </div>
+                    <i class="fas fa-chevron-right paroisse-arrow"></i>
+                </a>
+                
+                {# 
+                {% if paroisses %}
+                    {% for p in paroisses %}
+                    <a href="{{ url_for('gestion_intentions', paroisse_id=p.id) }}" class="paroisse-item">
+                        <div class="paroisse-info">
+                            <i class="fas fa-map-marker-alt paroisse-icon"></i>
+                            <span class="paroisse-name">{{ p.nom }}</span>
+                        </div>
+                        <i class="fas fa-chevron-right paroisse-arrow"></i>
+                    </a>
+                    {% endfor %}
+                {% endif %}
+                #}
+            </div>
+
+            <div class="stats-banner">
+                <div class="stat-item">
+                    <div class="stat-value">{{ paroisses|length if paroisses else '0' }}</div>
+                    <div class="stat-label">Paroisses</div>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <div class="stat-status"><i class="fas fa-circle" style="font-size: 0.6rem;"></i> En ligne</div>
+                </div>
+            </div>
+
+
+        </main>
+
+    </div>
 
     <script>
-        // Gestion Sidebar Mobile
-        const menuBtn = document.getElementById('mobile-menu-btn');
-        const sidebar = document.getElementById('sidebar');
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggleOpen = document.getElementById('menu-toggle-open');
+            const sideMenu = document.getElementById('side-menu');
+            const menuOverlay = document.getElementById('menu-overlay');
 
-        menuBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            sidebar.classList.toggle('active');
-        });
-
-        // Fermer la sidebar si on clique à côté sur mobile
-        document.addEventListener('click', (e) => {
-            if (window.innerWidth <= 992 && !sidebar.contains(e.target) && sidebar.classList.contains('active')) {
-                sidebar.classList.remove('active');
+            // Fonction pour ouvrir/fermer le menu
+            function toggleMenu() {
+                sideMenu.classList.toggle('active');
+                menuOverlay.classList.toggle('active');
+                // Empêche le défilement du corps quand le menu est ouvert
+                document.body.style.overflow = sideMenu.classList.contains('active') ? 'hidden' : '';
             }
+
+            // Ouvrir au clic sur le hamburger
+            menuToggleOpen.addEventListener('click', toggleMenu);
+
+            // Fermer si on clique sur l'overlay (à côté du menu)
+            menuOverlay.addEventListener('click', toggleMenu);
+
+            // Fermer si on clique sur un lien du menu (optionnel mais recommandé)
+            const menuLinks = document.querySelectorAll('.menu-links a');
+            menuLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    if (sideMenu.classList.contains('active')) {
+                        toggleMenu();
+                    }
+                });
+            });
         });
     </script>
+
 </body>
 </html>
-
 
