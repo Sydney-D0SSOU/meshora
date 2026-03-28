@@ -112,7 +112,7 @@
             <div class="step-item" id="dot-4" onclick="showStep(4)">Sécurité</div>
         </div>
 
-        <form action="/modifier-paroisse/{{ paroisse.id }}" method="POST" id="form-principal">
+        <form action="/modifier-paroisse/{{ paroisse.id }}" method="POST" enctype="multipart/form-data" id="form-principal">
             
             <div class="form-step form-step-active" id="step-1">
                 <div class="section-title">Annonces & Contact</div>
@@ -121,6 +121,14 @@
                 
                 <label>📞 Téléphone Paroisse :</label>
                 <input type="text" name="telephone" value="{{ paroisse.telephone }}">
+                
+                <label>🏛️ Logo de la Paroisse :</label>
+                {% if paroisse.logo %}
+                <img src="{{ url_for('static', filename='uploads/' + paroisse.logo) }}" alt="Logo actuel" style="max-width: 100px; margin-bottom: 10px; border-radius: 10px;">
+                {% else %}
+                <p style="font-size: 0.8rem; color: #64748b;">Aucun logo défini.</p>
+                {% endif %}
+                <input type="file" name="logo" accept="image/*" style="margin-top: 5px;">
                 
                 <div class="flex-btns">
                     <button type="button" class="btn-next" onclick="showStep(2)">Suivant : Horaires <i class="fas fa-arrow-right"></i></button>
